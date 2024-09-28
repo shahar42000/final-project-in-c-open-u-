@@ -868,6 +868,7 @@ else{
         fprintf(file, "0%d %s\n", current->position, octal);
         current = current->next;
     }
+    printf("information has been exported to ps.ob\n");
     
    
 }
@@ -927,5 +928,6 @@ void check_and_export_externs(ExternNode *externList, WordTable *wordTable) {
     }
 
     fclose(outputFile);
+    printf("Extern information has been exported to ps.ext\n");
 }
 }
