@@ -75,7 +75,7 @@ int is_valid_string(char *str) {
     }
     return 1;
 }
-
+/*check error for first process*/
 int checkFile1ForErrors(char *filename)
 {
     char line[LINE_SIZE + 2]; 
@@ -87,8 +87,9 @@ int checkFile1ForErrors(char *filename)
     int word_count_after_macr;
     int error_found = 0; 
     
-
+    /*open file*/
     FILE *file = fopen(filename, "r");
+    /*check for file null*/
     if (file == NULL) {
         printf("Error opening file\n");
         return 1; 
@@ -133,7 +134,7 @@ int checkFile1ForErrors(char *filename)
                         print_error(line_num, "invalide macro - macr after macr");
                         error_found = 1; 
                     }  
-                   
+                   /* macr already defined */
                     if (macro_already_appeared(token, macros, macro_count)) {
                         print_error(line_num, "This macro has already been defined.");
                         error_found = 1; 
@@ -141,12 +142,13 @@ int checkFile1ForErrors(char *filename)
                     }
                     strcpy(macros[macro_count], token);
                     macro_count++;
-
+                    /* check if opode after macr */
                     if (is_opcode(token)) {
                         print_error(line_num, "The word after 'macr' cannot be an opcode.");
                         error_found = 1; 
                         break;
                     }
+                    /* check if opode after instruction*/
                     if (is_instruction(token)) {
                         print_error(line_num, "The word after 'macr' cannot be an instruction.");
                         error_found = 1; 
@@ -156,13 +158,14 @@ int checkFile1ForErrors(char *filename)
             } 
             else if (found_macr) {
                 word_count_after_macr++;
+                /* check if after macro there is word */
                 if (word_count_after_macr > 1) {
                     print_error(line_num, "extra text in macro initialization");
                     error_found = 1; 
                     break;
                 }
             }
-
+            /* check if after endmacro there is word */
             if (strcmp(token, MACRO_END) == 0) {
                 token = strtok(NULL, " \t\n");  
                 if (token != NULL) {
@@ -180,7 +183,7 @@ int checkFile1ForErrors(char *filename)
     fclose(file);
     return error_found; 
 }
-
+/* check error for second pass */
 int checkFile2ForErrors(char *filename) {
     char line[LINE_SIZE];
     int line_num = 0;
@@ -195,8 +198,9 @@ int checkFile2ForErrors(char *filename) {
     int is_a_comma = 0 ;
     int is_a_space = 0 ;
     int is_a_dot = 0;
-    
+    /* open file for read */
     FILE *file = fopen(filename, "r");
+    /* check if null */
     if (file == NULL) {
         printf("Error opening file\n");
         return 1; 
@@ -206,7 +210,7 @@ int checkFile2ForErrors(char *filename) {
     while (fgets(line, sizeof(line), file)) {
         line_num++;
         strcpy(line_copy,line);
-    
+        /* check if line to long then 82*/
         if (line[strlen(line) - 1] != '\n' && strlen(line) >= LINE_SIZE - 1) {
             print_error(line_num, "Line is too long");
             error_found = 1; 
@@ -218,13 +222,15 @@ int checkFile2ForErrors(char *filename) {
          /* Check if the first token is a label */
         if (first_token != NULL && first_token[strlen(first_token) - 1] == ':') {
             first_token[strlen(first_token) - 1] = '\0';  
-
+            /* check if label as opcode ot instruction*/
             if (is_opcode(first_token) || is_instruction(first_token)) {
                 print_error(line_num, "Label cannot be an opcode or instruction");
                 error_found = 1;
+                /* check if label is by rule*/
             } else if (!is_valid_label(first_token)) {
                 print_error(line_num, "Label contains invalid characters");
                 error_found = 1;
+                /* check if label exist*/
             } else if (label_already_appeared(first_token, labels, label_count)) {
                 print_error(line_num, "Label already exist");
                 error_found = 1;
@@ -238,18 +244,21 @@ int checkFile2ForErrors(char *filename) {
         if (first_token != NULL) {
             if (is_instruction(first_token)) {
                 char *second_token = strtok(NULL, "\n");  
-
+                /* check for string*/
                 if (strcmp(first_token, ".string") == 0) {
+                    /* check if null after string like the rule*/
                     if (second_token == NULL) {
                         print_error(line_num, "Missing parameter after .string");
                         error_found = 1; 
-                    } else {
+                    } else 
+                    /* check for quote*/
+                    {
                         char *start_quote = strchr(second_token, '"');
                         char *end_quote = strrchr(second_token, '"');
                     if((start_quote==end_quote)&&(start_quote!=NULL)){
                        
                         
-                        
+                        /* check if missing quote*/
                         if ((end_quote != NULL )&&((end_quote[1]=='\0')||((end_quote[1]=='\n')||(end_quote[1]=='\t')||(end_quote[1]==' ')))) {
                             print_error(line_num, "Missing closing quote for string");
                             error_found = 1; 
@@ -258,7 +267,7 @@ int checkFile2ForErrors(char *filename) {
                             print_error(line_num, "Missing opening quote for string");
                             error_found = 1;
                         }  
-                        
+                        /* check if there invalide char in string*/
                         else {
                             char string_content[LINE_SIZE];
                             strncpy(string_content, start_quote + 1, end_quote - start_quote - 1);
@@ -271,10 +280,13 @@ int checkFile2ForErrors(char *filename) {
                         }
                     }
                     }
+                    /* check if missing parameters in instruction*/
                 } else if (second_token == NULL) {
                     print_error(line_num, "Missing parameter after instruction");
                     error_found = 1; 
                 }
+                /* check if missing parameters in opcode by the rule
+                or to many*/
             } else if (is_opcode(first_token)) {
                 char *second_token = strtok(NULL, " ,\t\n"); 
                 char *third_token = strtok(NULL, " ,\t\n");  
@@ -304,7 +316,7 @@ int checkFile2ForErrors(char *filename) {
                 }
             }
         }
-
+        /* check for label or word is long then 82 as need*/
         token = strtok(line, " \t\n");
         while (token != NULL) {
             if (strlen(token) > WORD_SIZE) {
@@ -322,17 +334,15 @@ int checkFile2ForErrors(char *filename) {
         
         
     }
+    /* check for data*/
        pointer_to_data=(strstr(line_copy,".data"));
-       
-       
-       
-       
-       
+    
        if(pointer_to_data!=NULL){
             pointer_to_data=pointer_to_data+5;
             while(pointer_to_data[0]==' '){
                     pointer_to_data++;
              }
+             /* check for commas*/
              if(pointer_to_data[0]==','){
                   print_error( line_num,"illegal comma first char after .data is comma");
              }
@@ -354,6 +364,7 @@ int checkFile2ForErrors(char *filename) {
                         is_a_space=0;
 
                     }
+                    /* check for num is only integer*/
                     if((is_a_int==1)&&(is_a_dot==1)){
                         print_error(line_num, "illegal invalid data parameter");
                         error_found=1;
@@ -397,5 +408,7 @@ int checkFile2ForErrors(char *filename) {
     
 
 
+
+  
 
   
