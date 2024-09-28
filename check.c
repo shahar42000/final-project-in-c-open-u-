@@ -7,7 +7,12 @@
 #include "check.h"
 #include "assembler.h"
 
+/* sturcters explantion we made structers that work like linked list to keep track on the keyword(commands) 
 
+label for save and count the amount of labels same for entry extern, word is another list for track word at each row  
+
+for each struct we made append,create and free  functions 
+*/
 
 Command commands[] = {
     {"mov", "0000"},
@@ -179,8 +184,8 @@ void freeEntryNodes(EntryNode *head) {
     }
 }
 
-
-void numberToBinary(int number , char output[15]) {/*get char and change the number to binary represent by string */
+/*the function get number and return it as a string we used this function in case we need the all table the op table to be the number */
+void numberToBinary(int number , char output[15]) {
     int i  ;
     for (i=14; i >= 0; i--){
         if (number & 1) {
@@ -194,8 +199,8 @@ void numberToBinary(int number , char output[15]) {/*get char and change the num
     
     output[15] = '\0';
 }
- 
- void dataToBinary(int number , char output[12]) {/*get char and change the number to binary represent by string */
+ /*same as the last function but this function return the binary number only at string as 12 length cause we want place in the op table 3-14*/
+ void dataToBinary(int number , char output[12]) {
     int i  ;
     for (i=11; i >= 0; i--){
         if (number & 1) {
@@ -209,7 +214,7 @@ void numberToBinary(int number , char output[15]) {/*get char and change the num
     
     output[12] = '\0';
 }
-
+/*get for the command structers the op value of the command like stop 15 in binary */
 char* getCommandBinaryValue(char* command) {
     int i ; 
     for (i=0; i <= 15; i++) {
@@ -236,7 +241,8 @@ Label* findLabel(Label* head, char* name) {
    
     return NULL;
 }
-
+/*this function read the file and then put each keyword in is category label,extern,entry and word .
+with use of char we categories diffrent sceanrios like the operends from the kind of rigester */
 void processFile( char *filename, WordTable **wordList, Label **labelList, ExternNode **externList, EntryNode **entryList) {
     FILE *file;
     char line[LINE_SIZE];
@@ -321,7 +327,7 @@ void processFile( char *filename, WordTable **wordList, Label **labelList, Exter
 
     fclose(file);
 }
-
+/*help us debug print the linked list */
 void printWordList(WordTable *head) {
     WordTable *current = head;
     while (current != NULL) {
@@ -368,7 +374,7 @@ int check_if_labael(char word [WORD_SIZE],Label **labelList ){
     return 0 ;
 
 }
-
+/*return the max line number so we can now how many lines there are in total */
 int getHighestLineNumber(WordTable *head) {
     int highestLineNumber = 0;
     WordTable *current = head;
@@ -382,6 +388,7 @@ int getHighestLineNumber(WordTable *head) {
 
     return highestLineNumber;
 }
+/*check if the word appear in entry list */
 int is_in_entry(EntryNode* HeadEntry, char* word) {
     EntryNode* current = HeadEntry;
     while (current != NULL) {
@@ -392,7 +399,7 @@ int is_in_entry(EntryNode* HeadEntry, char* word) {
     }
     return 0; 
 }
-
+/*check if the word appear in extern list */
 int is_in_extern(ExternNode* HeadExtern, char* word) {
     ExternNode* current = HeadExtern;
     while (current != NULL) {
@@ -403,7 +410,7 @@ int is_in_extern(ExternNode* HeadExtern, char* word) {
     }
     return 0; 
 }
-
+/*check the sort system by the operand */
 int check_sort (char op [WORD_SIZE],Label** labelList ,ExternNode** externlist){
 
     if(op[0]=='#'){
@@ -430,7 +437,7 @@ int check_sort (char op [WORD_SIZE],Label** labelList ,ExternNode** externlist){
 
 
 
-
+/*this function get line and change the binary value saved in the linked list we made */
 void change_to_binary(Label** labelList,EntryNode** HeadEntry,ExternNode** HeadExtern,WordTable **HeadWordList,int search_this_line){
     char *action_binary;
     char action[WORD_SIZE]="\0";
@@ -479,7 +486,7 @@ void change_to_binary(Label** labelList,EntryNode** HeadEntry,ExternNode** HeadE
     
     
     
-    if (action[0] != '\0') {
+    if (action[0] != '\0') { /*action represent the command */
     
         if (action[0] == '!') {
             current_num = (int)(action[1]);
@@ -593,7 +600,7 @@ void change_to_binary(Label** labelList,EntryNode** HeadEntry,ExternNode** HeadE
                     temp2->binaryValue[12]='1';
                     i=0;
                     while(i<=11){ 
-                        temp2->binaryValue[(11-i)]=binary_slot[(11-i)];/* fix the placement of the binary */
+                        temp2->binaryValue[(11-i)]=binary_slot[(11-i)];
                         i++;
                 }
                     
@@ -622,7 +629,7 @@ void change_to_binary(Label** labelList,EntryNode** HeadEntry,ExternNode** HeadE
             
                 if(check_sort(op1,labelList,HeadExtern)==2){
                     temp2->binaryValue[12]='1';
-                    numberToBinary(atoi(op1+2),binary_slot); /*add the correct place to the binary last updated16.9*/
+                    numberToBinary(atoi(op1+2),binary_slot); 
                     i = 0 ;
                     while(i<3){ 
                         temp2->binaryValue[i+9]=binary_slot[12+i];
@@ -657,7 +664,7 @@ void change_to_binary(Label** labelList,EntryNode** HeadEntry,ExternNode** HeadE
                     temp2->binaryValue[12]='1';
                     i = 0 ;
                     while(i<=11){ 
-                        temp2->binaryValue[(11-i)]=binary_slot[(11-i)];/* fix the placement of the binary */
+                        temp2->binaryValue[(11-i)]=binary_slot[(11-i)];
                         i++;
                 }
                     
@@ -686,7 +693,7 @@ void change_to_binary(Label** labelList,EntryNode** HeadEntry,ExternNode** HeadE
             
                 if(check_sort(op1,labelList,HeadExtern)==2){
                     temp2->binaryValue[12]='1';
-                    numberToBinary(atoi(op1+2),binary_slot); /*add the correct place to the binary last updated16.9*/
+                    numberToBinary(atoi(op1+2),binary_slot); 
                     i = 0 ;
                     while(i<3){ 
                         temp2->binaryValue[i+6]=binary_slot[12+i];
@@ -710,7 +717,7 @@ void change_to_binary(Label** labelList,EntryNode** HeadEntry,ExternNode** HeadE
                     temp3->binaryValue[12]='1';
                     i = 0 ;
                     while(i<=11){ 
-                        temp3->binaryValue[(11-i)]=binary_slot[(11-i)];/* fix the placement of the binary */
+                        temp3->binaryValue[(11-i)]=binary_slot[(11-i)];
                         i++;
                 }
                     
@@ -739,7 +746,7 @@ void change_to_binary(Label** labelList,EntryNode** HeadEntry,ExternNode** HeadE
             
                 if(check_sort(op2,labelList,HeadExtern)==2){
                     temp3->binaryValue[12]='1';
-                    numberToBinary(atoi(op2+2),binary_slot); /*add the correct place to the binary last updated16.9*/
+                    numberToBinary(atoi(op2+2),binary_slot); 
                     i = 0 ;
                     while(i<3){ 
                         temp3->binaryValue[i+9]=binary_slot[12+i];
@@ -804,6 +811,9 @@ void change_to_binary(Label** labelList,EntryNode** HeadEntry,ExternNode** HeadE
     }
 }
 
+
+/*this funtion call change to binary for each line get as parm the max number of lines*/
+
 void change_all_to_binary(Label** labelList, EntryNode** HeadEntry, ExternNode** HeadExtern, WordTable** HeadWordList, int max_line) {
     int current_line;
 
@@ -814,7 +824,7 @@ void change_all_to_binary(Label** labelList, EntryNode** HeadEntry, ExternNode**
     }
 }
 
-
+/*change the binary value to octal*/
 void binary_to_octal(WordTable* listWord, char* octal)
 {
     int decimal = 0;
@@ -848,6 +858,7 @@ void binary_to_octal(WordTable* listWord, char* octal)
         }
     }
 }
+/*this function makes the correct file and check if its needed to open the file if there are any entries extern etc */
 void writeWordTableToFile(WordTable *wordTable) {
     char *filename = "ps.ob"; 
     WordTable *current = wordTable;  
