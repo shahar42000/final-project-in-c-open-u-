@@ -1,3 +1,6 @@
+/*this is the pre prossecor part */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -240,7 +243,7 @@ int find_in_list(MacroList* head, char* word)
     }
     return 0;
 }
-
+/*this funtion search for the macro and replace it with the saved orders  */
 void copy_paste_files(MacroList *List_head, char *word, FILE *output_file) {
     MacroList *current = List_head;
     while (current != NULL) {
@@ -257,7 +260,7 @@ void copy_paste_files(MacroList *List_head, char *word, FILE *output_file) {
     }
 }
 
-
+/*make a new file after all the changes */
 void add_to_file(MacroList* List_head, char *input_file, char *output_file) {
     int last_round = 0 ; 
     int inside_macro = 0;
@@ -314,7 +317,7 @@ void add_to_file(MacroList* List_head, char *input_file, char *output_file) {
             fputc('\n', output_file_new);
             memset(line, 0, sizeof(line));  
             }
-        /*8888888888888888888888888888888888888888888888888888888888888888888888888888*/
+        
         if (((c == ' ') || (c == '\t') || (c == '\n')) && (strlen(word) > 0)) {
             strcat(line, " ");
             strcat(line, word);
@@ -339,4 +342,3 @@ void add_to_file(MacroList* List_head, char *input_file, char *output_file) {
     fclose(input_file_new);
     fclose(output_file_new);
 }
-
