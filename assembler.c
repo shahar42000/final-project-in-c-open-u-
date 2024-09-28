@@ -1,6 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "macro.h"
+/*this project made by shahar shriki and doron afriat 
+we like to thanks for all the help to you dr nhaman we hope you will injoy our project 
+and we wish you all the best thank you for great semester  */
+
 #include "error.h"
 #include "check.h"
 #include "assembler.h"
@@ -75,4 +76,3 @@ int main(int argc, char *argv[]) {
 
     return 0; 
 }
-
